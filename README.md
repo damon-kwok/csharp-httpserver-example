@@ -1,6 +1,10 @@
-CSharp `RESTful` example
+<a href="http://planet.lisp.org"><img src="https://dhalgara.com/content/images/2018/07/dotnet-logo.png" alt="dotnet Logo" width="80" height="80" align="right"></a>
+[![Rider](https://img.shields.io/badge/IDE-Rider-1f425f.svg)](https://www.jetbrains.com/rider/)
+[![GitHub license](https://img.shields.io/badge/license-BSD%202%20Clause-2e8b57.svg)](https://github.com/damon-kwok/csharp-httpserver-example/blob/main/LICENSE)
 
-TODO
+# CSharp `RESTful` example
+
+## TODO
 
 - [x] Base: Easy `RESTfulService` library
 - [x] Base: `SkipList` based rank
@@ -31,6 +35,6 @@ TODO
 - [ ] Build: MSBuild support
 - [ ] Performance: Replacing the default NIC driver with `INTEL DPDK`
 
-Know Problem
+## Know Problem
 
 - No data paging
