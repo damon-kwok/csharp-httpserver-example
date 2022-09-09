@@ -1,0 +1,13 @@
+*.~undo-tree~
+.DS_Store
+TAGS
+tags
+.idea/
+Debug/
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+*.sln.DotSettings.user
+
