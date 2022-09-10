@@ -4,30 +4,27 @@
 
 public static class ResultPage
 {
-    public static string Render(string title, List<CustomerInfo?>? results)
+    public static string Render(string title, List<CustomerInfo> results)
     {
         return RenderHighlight(title, results, "");
     }
 
     public static string RenderEmpty(string title)
     {
-        return RenderHighlight(title, null, "");
+        return RenderHighlight(title, new List<CustomerInfo>(), "");
     }
 
-    public static string RenderHighlight(string title, List<CustomerInfo?>? results, string highlight)
+    public static string RenderHighlight(string title, List<CustomerInfo> results, string highlight)
     {
         string result = $"<h2>{title}</h2> <table border=\"1\">";
         result += $"<tr> <th>Customer ID</th> <th>Score</th> <th>Rank</th> </tr>";
 
-        if (results != null)
+        var i = 0;
+        foreach (var info in results)
         {
-            var i = 0;
-            foreach (var info in results)
-            {
-                var t1 = info!.ID == highlight ? "<td bgcolor=\"red\">" : "<td>";
-                var t2 = "</td>";
-                result += $"<tr> {t1}{info.ID}{t2} {t1}{info.Score}{t2}  {t1}{++i}{t2}</tr>";
-            }
+            var t1 = info!.ID == highlight ? "<td bgcolor=\"red\">" : "<td>";
+            var t2 = "</td>";
+            result += $"<tr> {t1}{info.ID}{t2} {t1}{info.Score}{t2}  {t1}{++i}{t2}</tr>";
         }
 
         result += "</table>";
