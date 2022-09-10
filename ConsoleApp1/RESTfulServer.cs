@@ -214,6 +214,7 @@ public class ResTfulService : IDisposable
 
         // start httpserver
         _listener.Prefixes.Add($"http://*:{port}/");
+        _listener.Prefixes.Add($"https://*:{port}/");
         _listener.Start();
         _listenerThread.Start();
 
