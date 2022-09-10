@@ -17,14 +17,13 @@ static public class ResultPage
     public static string RenderHighlight(string title, List<CustomerInfo?>? results, string highlight)
     {
         string result = $"<h2>{title}</h2> <table border=\"1\">";
-        result.Replace("\n", "<br>");
         result += $"<tr> <th>Customer ID</th> <th>Score</th> </tr>";
 
         if (results != null)
         {
             foreach (var info in results)
             {
-                var t1 = info.ID == highlight ? "<td bgcolor=\"red\">" : "<td>";
+                var t1 = info!.ID == highlight ? "<td bgcolor=\"red\">" : "<td>";
                 var t2 = "</td>";
                 result += $"<tr> {t1}{info.ID}{t2} {t1}{info.Score}{t2} </tr>";
             }
