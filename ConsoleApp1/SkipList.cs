@@ -7,7 +7,7 @@ public class SkipList<T>
     private const int MaxLevel = 10;
     private readonly Func<T, T, int> _sortComparator;
     private readonly Func<T, T, bool> _eraseComparator;
-    private Node<T?>? _head = new(default, MaxLevel);
+    private Node? _head = new(default!, MaxLevel);
     private Random _random = new();
     private int _curMaxLevel = 1;
 
@@ -19,7 +19,7 @@ public class SkipList<T>
 
     public void Clear()
     {
-        _head = new(default, MaxLevel);
+        _head = new(default!, MaxLevel);
         _random = new();
         _curMaxLevel = 1;
     }
@@ -127,7 +127,7 @@ public class SkipList<T>
     {
         // Create `new node'
         var level = RandomLevel();
-        var newNode = new Node<T?>(data, level);
+        var newNode = new Node(data, level);
 
         // Create index for the `new node':
         // First, Find from top layer,  and then: Take the smallest node in the i-th layer that is larger than this node
@@ -177,10 +177,10 @@ public class SkipList<T>
         Insert(newData);
     }
 
-    private List<Tuple<int, Node<T>>> FindNode(T data, bool multiple)
+    private List<Tuple<int, Node>> FindNode(T data, bool multiple)
     {
         var p = _head;
-        var result = new List<Tuple<int, Node<T>>>();
+        var result = new List<Tuple<int, Node>>();
         for (var i = _curMaxLevel - 1; i >= 0; i--)
         {
             while (p?.GetNext(i) != null &&
@@ -189,7 +189,7 @@ public class SkipList<T>
             if (p?.GetNext(i) != null &&
                 _sortComparator(p.GetNext(i)!.GetData()!, data) == 0)
             {
-                result.Add(new Tuple<int, Node<T>>(i, p.GetNext(i)!));
+                result.Add(new Tuple<int, Node>(i, p.GetNext(i)!));
                 if (multiple)
                 {
                     var pre = p.GetNext(i);
@@ -199,7 +199,7 @@ public class SkipList<T>
                     while (next?.GetNext(0) != null &&
                            _sortComparator(next.GetNext(0)!.GetData()!, data) == 0)
                     {
-                        result.Add(new Tuple<int, Node<T>>(i, next.GetNext(0)!));
+                        result.Add(new Tuple<int, Node>(i, next.GetNext(0)!));
                         next = next.GetNext(0);
                     }
 
@@ -208,7 +208,7 @@ public class SkipList<T>
                            pre.GetPre(0)!.GetData() != null &&
                            _sortComparator(pre.GetPre(0)!.GetData()!, data) == 0)
                     {
-                        result.Add(new Tuple<int, Node<T>>(i, pre.GetPre(0)!));
+                        result.Add(new Tuple<int, Node>(i, pre.GetPre(0)!));
                         pre = pre.GetPre(0);
                     }
                 }
@@ -256,22 +256,22 @@ public class SkipList<T>
         return result;
     }
 
-    private class Node<T>
+    private class Node
     {
         private readonly T _data;
 
         private readonly int _level;
 
-        private readonly Node<T>?[] _nextArray;
+        private readonly Node?[] _nextArray;
 
-        private readonly Node<T>?[] _preArray;
+        private readonly Node?[] _preArray;
 
         public Node(T data, int level)
         {
             _data = data;
             _level = level;
-            _nextArray = new Node<T>?[level];
-            _preArray = new Node<T>?[level];
+            _nextArray = new Node?[level];
+            _preArray = new Node?[level];
         }
 
         public T GetData()
@@ -284,27 +284,27 @@ public class SkipList<T>
             return _level;
         }
 
-        public Node<T>? GetNext(int i)
+        public Node? GetNext(int i)
         {
             if (i >= 0 && i < _nextArray.Length)
                 return _nextArray[i];
             return null;
         }
 
-        public void SetNext(int i, Node<T>? node)
+        public void SetNext(int i, Node? node)
         {
             if (i >= 0 && i < _nextArray.Length)
                 _nextArray[i] = node;
         }
 
-        public Node<T>? GetPre(int i)
+        public Node? GetPre(int i)
         {
             if (i >= 0 && i < _preArray.Length)
                 return _preArray[i];
             return null;
         }
 
-        public void SetPre(int i, Node<T>? node)
+        public void SetPre(int i, Node? node)
         {
             if (i >= 0 && i < _preArray.Length)
                 _preArray[i] = node;
