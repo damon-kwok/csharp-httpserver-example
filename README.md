@@ -35,7 +35,7 @@
 - [ ] Build: MSBuild support
 - [ ] Performance: Replacing the default NIC driver with `INTEL DPDK`
 
-## Know Problem
+## Known bugs
 
 - Viewer: No data paging
 - SkipList: look forward
