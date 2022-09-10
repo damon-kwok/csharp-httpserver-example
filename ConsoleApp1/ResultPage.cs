@@ -2,7 +2,7 @@
 
 // View: Result
 
-static public class ResultPage
+public static class ResultPage
 {
     public static string Render(string title, List<CustomerInfo?>? results)
     {

@@ -12,7 +12,7 @@ var data = new SkipList<CustomerInfo>(delegate(CustomerInfo a, CustomerInfo b)
     if (a.Score < b.Score)
         return 1;
     return -1;
-}, delegate(CustomerInfo a, CustomerInfo b) { return a.ID == b.ID; });
+}, (a, b) => a.ID == b.ID);
 
 // Test SkipList
 /*
@@ -33,7 +33,7 @@ lock (data)
 
     Console.WriteLine(Utils.ToString(data.FindAll(new CustomerInfo(10))));
 
-    data.Earse(new CustomerInfo("1005", 32));
+    data.Erase(new CustomerInfo("1005", 32));
     Console.WriteLine(data);
 
     data.Clear();

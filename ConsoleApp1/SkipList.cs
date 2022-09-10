@@ -147,7 +147,7 @@ public class SkipList<T>
         _curMaxLevel = Math.Max(_curMaxLevel, level);
     }
 
-    public List<T?> Earse(T data)
+    public List<T?> Erase(T data)
     {
         var nodes = FindNode(data, true);
         var result = new List<T?>();
@@ -173,7 +173,7 @@ public class SkipList<T>
 
     public void Update(T oldData, T newData)
     {
-        Earse(oldData);
+        Erase(oldData);
         Insert(newData);
     }
 
@@ -240,7 +240,7 @@ public class SkipList<T>
     public T? FindOne(T data)
     {
         var values = Find(data, false);
-        return values.Count() == 0 ? default : values[0];
+        return !values.Any() ? default : values[0]; // values.Count() == 0 ? default : values[0];
     }
 
     public List<T?> FindAll()

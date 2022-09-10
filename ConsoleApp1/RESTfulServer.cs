@@ -145,7 +145,7 @@ public class ResTfulService : IDisposable
             _defaultRoute = method;
     }
 
-    protected void ProcessHttpRequest(HttpListenerContext context)
+    private void ProcessHttpRequest(HttpListenerContext context)
     {
         Func<HttpListenerContext, Tuple<int, string>>? method = null;
         IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>? routeDict = null;
