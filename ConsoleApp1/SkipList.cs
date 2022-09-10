@@ -147,28 +147,26 @@ public class SkipList<T>
         _curMaxLevel = Math.Max(_curMaxLevel, level);
     }
 
-    public List<T?> Erase(T data)
+    private void Erase(T data)
     {
         var nodes = FindNode(data, true);
-        var result = new List<T?>();
+        //var result = new List<T?>();
         foreach (var tup in nodes)
         {
             var cur = tup.Item2;
             if (_eraseComparator(cur.GetData(), data))
             {
-                //var level = cur.GetLevel();
-                var pre = cur.GetPre(0);
+              var pre = cur.GetPre(0);
                 var next = cur.GetNext(0);
                 if (pre != null)
                     pre.SetNext(0, next);
                 if (next != null)
                     next.SetPre(0, pre);
-                result.Add(cur.GetData());
+                //result.Add(cur.GetData());
                 break;
             }
         }
-
-        return result;
+        //return result;
     }
 
     public void Update(T oldData, T newData)
@@ -220,7 +218,7 @@ public class SkipList<T>
         return result;
     }
 
-    public List<T?> Find(T data, bool multiple)
+    private List<T?> Find(T data, bool multiple)
     {
         var nodes = FindNode(data, multiple);
         var result = new List<T?>();
