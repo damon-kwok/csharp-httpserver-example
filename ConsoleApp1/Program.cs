@@ -4,42 +4,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using ConsoleApp1;
 
-IDictionary<string, Int64> scoreCaches = new Dictionary<string, Int64>();
-var data = new SkipList<CustomerInfo>(delegate(CustomerInfo a, CustomerInfo b)
-{
-    if (a.Score == b.Score)
-        return 0;
-    if (a.Score < b.Score)
-        return 1;
-    return -1;
-}, (a, b) => a.ID == b.ID);
-
-// Test SkipList
-/*
-lock (data)
-{
-    data.Insert(new CustomerInfo("1001", 10));
-    data.Insert(new CustomerInfo("1002", 51));
-    data.Insert(new CustomerInfo("1003", 10));
-    data.Insert(new CustomerInfo("1004", 20));
-    data.Insert(new CustomerInfo("1005", 32));
-
-    Console.WriteLine(data);
-
-    Console.WriteLine(Utils.ToString(data.FindAll(new CustomerInfo(10))));
-
-    data.Update(new CustomerInfo("1003", 10), new CustomerInfo("1003", 999));
-    Console.WriteLine(data);
-
-    Console.WriteLine(Utils.ToString(data.FindAll(new CustomerInfo(10))));
-
-    data.Erase(new CustomerInfo("1005", 32));
-    Console.WriteLine(data);
-
-    data.Clear();
-    Console.WriteLine(data);
-}
-*/
+var data = new SkipList<string, long, CustomerInfo>(true, 10);
 
 var server = new ResTfulService(Environment.ProcessorCount);
 server.GET("/", delegate
@@ -71,21 +36,16 @@ server.GET("/reset", delegate
 server.GET("/init", delegate
 {
     string renderString;
-    var topN = 10;
+    const int topN = 10;
 
     lock (data)
     {
         data.Clear();
-        data.Insert(new CustomerInfo("1001", 1));
-        scoreCaches["1001"] = 1;
-        data.Insert(new CustomerInfo("1002", 2));
-        scoreCaches["1002"] = 2;
-        data.Insert(new CustomerInfo("1003", 3));
-        scoreCaches["1003"] = 3;
-        data.Insert(new CustomerInfo("1004", 4));
-        scoreCaches["1004"] = 4;
-        data.Insert(new CustomerInfo("1005", 5));
-        scoreCaches["1005"] = 5;
+        data.Insert("1001", 1, new CustomerInfo("1001", 1));
+        data.Insert("1002", 2, new CustomerInfo("1002", 2));
+        data.Insert("1003", 3, new CustomerInfo("1003", 3));
+        data.Insert("1004", 4, new CustomerInfo("1004", 4));
+        data.Insert("1005", 5, new CustomerInfo("1005", 5));
 
         renderString = ResultPage.Render($"Init: Top {topN}:\n", data.Top(topN));
     }
@@ -97,31 +57,17 @@ server.GET("/init", delegate
 server.POST(@"/customer/\d+/score/\d+", delegate(HttpListenerContext context)
 {
     var input = context.Request.Url?.LocalPath;
-    var pattern = @"\d+";
+    const string pattern = @"\d+";
     var mc = Regex.Matches(input!, pattern);
     var customerId = mc[0].Value;
     var score = Convert.ToInt64(mc[1].Value);
-    var method = "Insert";
     string renderString;
     const int topN = 10;
 
     lock (data)
     {
-        if (scoreCaches.ContainsKey(customerId))
-        {
-            method = "Update";
-            if (score != scoreCaches[customerId])
-            {
-                var info = new CustomerInfo(customerId, scoreCaches[customerId]);
-                data.Update(info, new CustomerInfo(customerId, score));
-            }
-        }
-        else
-        {
-            data.Insert(new CustomerInfo(customerId, score));
-        }
-
-        scoreCaches[customerId] = score;
+        var method = data.ContainsKey(customerId) ? "Update" : "Insert";
+        data.Update(customerId, score, new CustomerInfo(customerId, score));
         // Render TopN
         renderString = ResultPage.Render($"{method} succeed! Top {topN}:\n", data.Top(topN));
     }
@@ -133,14 +79,14 @@ server.POST(@"/customer/\d+/score/\d+", delegate(HttpListenerContext context)
 server.GET(@"/leaderboard", delegate(HttpListenerContext context)
 {
     var query = context.Request.QueryString;
-    Int64 start = 0;
-    Int64 end = 10;
-    if (!String.IsNullOrEmpty(query["start"]))
+    long start = 0;
+    long end = 10;
+    if (!string.IsNullOrEmpty(query["start"]))
     {
         start = Convert.ToInt64(query["start"]);
     }
 
-    if (!String.IsNullOrEmpty(query["end"]))
+    if (!string.IsNullOrEmpty(query["end"]))
     {
         end = Convert.ToInt64(query["end"]);
     }
@@ -158,37 +104,29 @@ server.GET(@"/leaderboard", delegate(HttpListenerContext context)
 server.GET(@"/leaderboard/\d+", delegate(HttpListenerContext context)
 {
     var input = context.Request.Url?.LocalPath;
-    var pattern = @"\d+";
+    const string pattern = @"\d+";
     var mc = Regex.Matches(input!, pattern);
     var customerId = mc[0].Value;
 
     var query = context.Request.QueryString;
-    Int64 high = 0;
-    Int64 low = 0;
-    if (!String.IsNullOrEmpty(query["high"]))
+    long high = 0;
+    long low = 0;
+    if (!string.IsNullOrEmpty(query["high"]))
     {
         high = Convert.ToInt64(query["high"]);
     }
 
-    if (!String.IsNullOrEmpty(query["low"]))
+    if (!string.IsNullOrEmpty(query["low"]))
     {
         low = Convert.ToInt64(query["low"]);
     }
 
     string renderString;
-    if (scoreCaches.ContainsKey(customerId))
+    lock (data)
     {
-        var info = new CustomerInfo(customerId, scoreCaches[customerId]);
-        lock (data)
-        {
-            // Render around
-            renderString = ResultPage.RenderHighlight($"Leaderboard:: Customer:{customerId} (High:{high}-Low:{low}):\n",
-                data.Around(info, high, low)!, customerId);
-        }
-    }
-    else
-    {
-        renderString = ResultPage.RenderEmpty($"Leaderboard:: Customer:{customerId} (High:{high}-Low:{low}):\n");
+        // Render around
+        renderString = ResultPage.RenderHighlight($"Leaderboard:: Customer:{customerId} (High:{high}-Low:{low}):\n",
+            data.Around(customerId, high, low)!, customerId);
     }
 
     var response = new Tuple<int, string>(200, renderString);
