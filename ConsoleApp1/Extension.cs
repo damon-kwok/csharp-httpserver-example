@@ -7,7 +7,7 @@ public static class Utils
         string result = "List:: <";
         foreach (var item in list)
         {
-            result += item.ToString() + ", ";
+            result += item + ", ";
         }
 
         result += ">";
