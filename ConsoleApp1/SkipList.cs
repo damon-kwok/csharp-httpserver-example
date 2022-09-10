@@ -158,6 +158,10 @@ public class SkipList<TKey, TScore, TData>
             _curLevel--;
 
         _count--;
+
+        // update cache
+        _scoreCaches.Remove(node.Key);
+        //_nodeCaches.Remove(key);
     }
 
     public bool ContainsKey(TKey key)
@@ -196,15 +200,8 @@ public class SkipList<TKey, TScore, TData>
         }
 
         this.DeleteNode(cur, update);
-
-        // update cache
-        _scoreCaches.Remove(key);
-        //_nodeCaches.Remove(key);
-
         //Console.WriteLine($"Successfully deleted key:{key}");
         //return cur;
-
-        //return null;
     }
 
     public void Update(TKey key, TScore newScore, TData? d)
@@ -216,16 +213,21 @@ public class SkipList<TKey, TScore, TData>
             return;
         }
 
-        // update data
-        node.Data = d;
-
         // current score
         var curScore = node.Score;
 
         // don't need update score
         if (curScore.CompareTo(newScore) == 0)
-            return;
-
+        {
+            // only update data
+            node.Data = d;
+        }
+        else
+        {
+            this.Delete(key, curScore);
+            this.Insert(key, newScore, d);
+        }
+        /*
         // We need to seek to element to update to start: this is useful anyway,
         // we'll have to update or remove it.
         var update = new Node[_maxLevel];
@@ -265,8 +267,8 @@ public class SkipList<TKey, TScore, TData>
 
         // No way to reuse the old node: we need to remove and insert a new
         // one at a different place.
-        // this.DeleteNode(cur, update);
-        // this.Insert(key, newScore, d);
+        this.DeleteNode(cur, update);
+        this.Insert(key, newScore, d);*/
     }
 
     public override string ToString()
