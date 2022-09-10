@@ -4,12 +4,8 @@ public static class Utils
 {
     public static string ToString(List<CustomerInfo> list)
     {
-        string result = "List:: <";
-        foreach (var item in list)
-        {
-            result += item + ", ";
-        }
-
+        var result = list.Aggregate("List:: <",
+            (current, item) => current + (item + ", "));
         result += ">";
         return result;
     }
