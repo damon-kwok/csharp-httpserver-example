@@ -10,11 +10,10 @@
 - [x] Base: `SkipList` based rank
 - [x] Base: `Regex based` route parse
 - [x] Style: Editorconfig file
-- [ ] Base: data version based `Caches` for rank
-- [ ] Base: Key code comments
+- [x] Base: Key code comments
 - [ ] Doc: doxygen support
 - [ ] Base: Testcases
-- [ ] Performance: Performance profiler with `dotTrace/dotMemory`
+- [ ] Performance: Performance profiler
 - [ ] Library: Route `real data type` parser
 - [ ] Extend: `HTTPS` and `Certificate` support
 - [ ] Extend: More `Status Code` support
