@@ -96,7 +96,7 @@ server.GET(@"/leaderboard", delegate(HttpListenerContext context)
     string renderString;
     lock (data)
     {
-        renderString = ResultPage.Render($"Leaderboard:{start}-{end}:\n",
+        renderString = ResultPage.Render($"Leaderboard:: Rank({start}-{end})\n",
             data.Range(start, end), start);
     }
 
@@ -129,7 +129,7 @@ server.GET(@"/leaderboard/\d+", delegate(HttpListenerContext context)
     {
         // Render around
         renderString = ResultPage.RenderHighlight(
-            $"Leaderboard:: Customer:{customerId} (High:{high}-Low:{low}):\n",
+            $"Leaderboard:: Customer:{customerId} (High:{high}-Low:{low})\n",
             data.Around(customerId, high, low), customerId);
     }
 

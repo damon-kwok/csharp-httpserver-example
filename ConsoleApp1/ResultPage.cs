@@ -51,7 +51,7 @@ public static class ResultPage
 
     public static string Render404()
     {
-        const string str = "404:\n Are you lost?";
+        const string str = "404::\n Are you lost?";
         return str;
     }
 }
