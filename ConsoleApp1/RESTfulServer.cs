@@ -152,7 +152,7 @@ public class ResTfulService : IDisposable
 
         var path = context.Request.Url!.LocalPath;
 
-        if (path[^1] == '/')
+        if (path.Length>1 && path[^1] == '/')
             path = path[..^1];
 
         routeDict = context.Request.HttpMethod switch
