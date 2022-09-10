@@ -327,7 +327,7 @@ public class SkipList<TKey, TScore, TData>
         return results;
     }
 
-    /*
+
     private bool IsInScoreRange(TScore start, TScore end)
     {
         var cur = _tail;
@@ -364,28 +364,21 @@ public class SkipList<TKey, TScore, TData>
 
         return results;
     }
-    */
 
     public List<TData> Range(long a, long b)
     {
         var results = new List<TData>();
         var start = Math.Min(a, b);
         var end = Math.Max(a, b);
-        var n = end-start+1;
-        var cur = _head!;
-        while (cur != null && n >= 0)
+        var i = 0;
+        var cur = _head;
+
+        while (cur != null && i++<end)
         {
             cur = cur.Levels[0].Forward;
-            if (start > 0)
-            {
-                start--;
-                continue;
-            }
-            if(cur != null && cur.Data != null)
+            if(i>=start && cur != null && cur.Data != null)
                 results.Add(cur!.Data);
-            n--;
         }
-
         return results;
     }
 
