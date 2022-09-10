@@ -2,7 +2,7 @@
 
 public static class Utils
 {
-    public static string ToString(List<CustomerInfo> list)
+    public static string ToString(IEnumerable<CustomerInfo> list)
     {
         var result = list.Aggregate("List:: <",
             (current, item) => current + (item + ", "));

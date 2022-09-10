@@ -182,18 +182,16 @@ public class SkipList<TKey, TScore, TData>
         // We may have multiple elements with the same score, what we need
         // is to find the element with both the right score and key.
         cur = cur!.Levels[0].Forward;
-        if (cur != null && score.CompareTo(cur.Score) == 0 &&
-            cur.Key.CompareTo(key) == 0)
-        {
-            this.DeleteNode(cur, update);
+        if (cur == null || score.CompareTo(cur.Score) != 0 ||
+            cur.Key.CompareTo(key) != 0) return;
+        this.DeleteNode(cur, update);
 
-            // update cache
-            _scoreCaches.Remove(key);
-            _nodeCaches.Remove(key);
+        // update cache
+        _scoreCaches.Remove(key);
+        _nodeCaches.Remove(key);
 
-            //Console.WriteLine($"Successfully deleted key:{key}");
-            //return cur;
-        }
+        //Console.WriteLine($"Successfully deleted key:{key}");
+        //return cur;
 
         //return null;
     }
@@ -239,20 +237,18 @@ public class SkipList<TKey, TScore, TData>
         // If the node, after the score update, would be still exactly
         // at the same position, we can just update the score without
         // actually removing and re-inserting the element in the SkipList.
-        if ((cur!.Backward == null ||
-             CompareScore(cur.Backward!, newScore) < 0) &&
-            (cur.Levels[0].Forward == null ||
-             CompareScore(cur.Levels[0].Forward!, newScore) > 0))
-        {
-            cur.Score = newScore;
+        if ((cur!.Backward != null &&
+             CompareScore(cur.Backward!, newScore) >= 0) ||
+            (cur.Levels[0].Forward != null &&
+             CompareScore(cur.Levels[0].Forward!, newScore) <= 0)) return;
+        cur.Score = newScore;
 
-            // update cache
-            _scoreCaches[key] = newScore;
-            _nodeCaches[key] = cur;
+        // update cache
+        _scoreCaches[key] = newScore;
+        _nodeCaches[key] = cur;
 
-            //Console.WriteLine($"Successfully updated key:{key} to newScore:{newScore}");
-            //return cur;
-        }
+        //Console.WriteLine($"Successfully updated key:{key} to newScore:{newScore}");
+        //return cur;
 
         // No way to reuse the old node: we need to remove and insert a new
         // one at a different place.
@@ -292,20 +288,24 @@ public class SkipList<TKey, TScore, TData>
     private int CompareScore(TScore a, TScore b)
     {
         var v =  a.CompareTo(b);
-        if (_reverseOrder && v == -1)
-            v = 1;
-        else if (_reverseOrder && v == 1)
-            v = -1;
+        v = _reverseOrder switch
+        {
+            true when v == -1 => 1,
+            true when v == 1 => -1,
+            _ => v
+        };
         return v;
     }
 
     private int CompareScore(Node a, TScore score)
     {
         var v= a.Score.CompareTo(score);
-        if (_reverseOrder && v == -1)
-            v = 1;
-        else if (_reverseOrder && v == 1)
-            v = -1;
+        v = _reverseOrder switch
+        {
+            true when v == -1 => 1,
+            true when v == 1 => -1,
+            _ => v
+        };
         return v;
     }
 
