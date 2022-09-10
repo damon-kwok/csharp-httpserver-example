@@ -4,7 +4,7 @@
 
 static public class ResultPage
 {
-    public static string Render(string title, List<CustomerInfo?> results)
+    public static string Render(string title, List<CustomerInfo?>? results)
     {
         return RenderHighlight(title, results, "");
     }
@@ -14,7 +14,7 @@ static public class ResultPage
         return RenderHighlight(title, null, "");
     }
 
-    public static string RenderHighlight(string title, List<CustomerInfo?> results, string highlight)
+    public static string RenderHighlight(string title, List<CustomerInfo?>? results, string highlight)
     {
         string result = $"<h2>{title}</h2> <table border=\"1\">";
         result.Replace("\n", "<br>");

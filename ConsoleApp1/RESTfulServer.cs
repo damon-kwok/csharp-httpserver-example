@@ -1,10 +1,11 @@
 ﻿using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.Threading.WaitHandle;
 
 namespace ConsoleApp1;
 
-public class RESTfulService : IDisposable
+public class ResTfulService : IDisposable
 {
     private readonly HttpListener _listener; // HTTP listener
     private readonly Thread _listenerThread; // thread for listen
@@ -14,19 +15,19 @@ public class RESTfulService : IDisposable
     private event Action<HttpListenerContext>? ProcessRequest;
 
     // URL Routes
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>
+    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
         _getRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>
+    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
         _postRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>
+    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
         _putRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>
+    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
         _patchRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>
+    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
         _deleteRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
 
     private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>
@@ -41,9 +42,9 @@ public class RESTfulService : IDisposable
     private Func<HttpListenerContext, Tuple<int, string>>? _defaultRoute;
 
     // URL regex cache
-    private readonly IDictionary<string, Regex> _regexCaches = new Dictionary<string, Regex>();
+    //private readonly IDictionary<string, Regex> _regexCaches = new Dictionary<string, Regex>();
 
-    public RESTfulService(int maxThreads)
+    public ResTfulService(int maxThreads)
     {
         _workers = new Thread[maxThreads];
         _queue = new Queue<HttpListenerContext>();
@@ -51,7 +52,7 @@ public class RESTfulService : IDisposable
         _ready = new ManualResetEvent(false);
         _listener = new HttpListener();
         _listenerThread = new Thread(HandleRequests);
-        _defaultRoute = delegate(HttpListenerContext context)
+        _defaultRoute = delegate
         {
             var response = new Tuple<int, string>(200, "404");
             return response;
@@ -67,47 +68,47 @@ public class RESTfulService : IDisposable
     {
         url = AdjustUrl(url);
         Regex regex = new Regex(url);
-        _regexCaches[url] = regex;
-        _getRoute[regex] = method;
+        //_regexCaches[url] = regex;
+        _getRoute![regex] = method;
     }
 
     public void POST(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         Regex regex = new Regex(url);
-        _regexCaches[url] = regex;
-        _getRoute[regex] = method;
+        //_regexCaches[url] = regex;
+        _getRoute![regex] = method;
     }
 
     public void PUT(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         Regex regex = new Regex(url);
-        _regexCaches[url] = regex;
-        _getRoute[regex] = method;
+        //_regexCaches[url] = regex;
+        _getRoute![regex] = method;
     }
 
     public void PATCH(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         Regex regex = new Regex(url);
-        _regexCaches[url] = regex;
-        _getRoute[regex] = method;
+        //_regexCaches[url] = regex;
+        _getRoute![regex] = method;
     }
 
     public void DELETE(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         Regex regex = new Regex(url);
-        _regexCaches[url] = regex;
-        _getRoute[regex] = method;
+        //_regexCaches[url] = regex;
+        _getRoute![regex] = method;
     }
 
     public void OPTIONS(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         Regex regex = new Regex(url);
-        _regexCaches[url] = regex;
+        //_regexCaches[url] = regex;
         _optionsRoute[regex] = method;
     }
 
@@ -115,7 +116,7 @@ public class RESTfulService : IDisposable
     {
         url = AdjustUrl(url);
         Regex regex = new Regex(url);
-        _regexCaches[url] = regex;
+        //_regexCaches[url] = regex;
         _traceRoute[regex] = method;
     }
 
@@ -123,7 +124,7 @@ public class RESTfulService : IDisposable
     {
         url = AdjustUrl(url);
         Regex regex = new Regex(url);
-        _regexCaches[url] = regex;
+        //_regexCaches[url] = regex;
         _headRoute[regex] = method;
     }
 
@@ -138,7 +139,7 @@ public class RESTfulService : IDisposable
         return url;
     }
 
-    public void DEFAULT(Func<HttpListenerContext, Tuple<int, string>>? method)
+    public void Default(Func<HttpListenerContext, Tuple<int, string>>? method)
     {
         if (method != null)
             _defaultRoute = method;
@@ -147,11 +148,11 @@ public class RESTfulService : IDisposable
     protected void ProcessHttpRequest(HttpListenerContext context)
     {
         Func<HttpListenerContext, Tuple<int, string>>? method = null;
-        IDictionary<Regex, Func<HttpListenerContext, Tuple<int, String>>> routeDict = null;
+        IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>? routeDict = null;
 
-        string path = context.Request.Url.LocalPath;
+        string path = context.Request.Url!.LocalPath;
 
-        if (path[path.Length - 1] == '/')
+        if (path[^1] == '/')
             path = path.Substring(0, path.Length - 1);
 
         switch (context.Request.HttpMethod)
@@ -172,19 +173,19 @@ public class RESTfulService : IDisposable
                 routeDict = _deleteRoute;
                 break;
             case "OPTIONS":
-                routeDict = _deleteRoute;
+                routeDict = _optionsRoute;
                 break;
             case "TRACE":
-                routeDict = _deleteRoute;
+                routeDict = _traceRoute;
                 break;
             case "HEAD":
-                routeDict = _deleteRoute;
+                routeDict = _headRoute;
                 break;
         }
 
         if (method == null)
         {
-            foreach (var pair in routeDict)
+            foreach (var pair in routeDict!)
             {
                 if (pair.Key.IsMatch(path))
                 {
@@ -195,10 +196,9 @@ public class RESTfulService : IDisposable
         }
 
 
-        if (method == null)
-            method = _defaultRoute;
+        method ??= _defaultRoute;
 
-        var response = method(context);
+        var response = method!(context);
         var buffer = Encoding.UTF8.GetBytes(response.Item2);
         context.Response.StatusCode = response.Item1;
         context.Response.ContentLength64 = buffer.Length;
@@ -239,7 +239,7 @@ public class RESTfulService : IDisposable
         while (_listener.IsListening)
         {
             var context = _listener.BeginGetContext(ContextReady, null);
-            if (0 == WaitHandle.WaitAny(new[] { _stop, context.AsyncWaitHandle })) return;
+            if (0 == WaitAny(new[] { _stop, context.AsyncWaitHandle })) return;
         }
     }
 
@@ -261,8 +261,9 @@ public class RESTfulService : IDisposable
 
     private void Worker()
     {
-        WaitHandle[] wait = { _ready, _stop };
-        while (0 == WaitHandle.WaitAny(wait))
+      // ReSharper disable once InconsistentlySynchronizedField
+      WaitHandle[] wait = { _ready, _stop };
+        while (0 == WaitAny(wait))
         {
             HttpListenerContext context;
             lock (_queue)

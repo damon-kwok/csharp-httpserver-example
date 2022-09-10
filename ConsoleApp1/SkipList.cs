@@ -135,13 +135,13 @@ public class SkipList<T>
         var p = _head;
         for (var i = level - 1; i >= 0; i--)
         {
-            while (p?.GetNext(i) != null &&
-                   _sortComparator(p.GetNext(i).GetData(), data) <= 0)
+          while (p?.GetNext(i) != null &&
+                 _sortComparator(p.GetNext(i)!.GetData()!, data) <= 0)
                 p = p.GetNext(i);
             // Insert the new node at the i-th layer
             newNode.SetPre(i, p);
-            newNode.SetNext(i, p.GetNext(i));
-            p.SetNext(i, newNode);
+            newNode.SetNext(i, p?.GetNext(i));
+            p!.SetNext(i, newNode);
         }
 
         _curMaxLevel = Math.Max(_curMaxLevel, level);
@@ -156,7 +156,7 @@ public class SkipList<T>
             var cur = tup.Item2;
             if (_eraseComparator(cur.GetData(), data))
             {
-                var level = cur.GetLevel();
+                //var level = cur.GetLevel();
                 var pre = cur.GetPre(0);
                 var next = cur.GetNext(0);
                 if (pre != null)
@@ -184,31 +184,31 @@ public class SkipList<T>
         for (var i = _curMaxLevel - 1; i >= 0; i--)
         {
             while (p?.GetNext(i) != null &&
-                   _sortComparator(p.GetNext(i).GetData(), data) < 0)
+                   _sortComparator(p.GetNext(i)!.GetData()!, data) < 0)
                 p = p.GetNext(i);
             if (p?.GetNext(i) != null &&
-                _sortComparator(p.GetNext(i).GetData(), data) == 0)
+                _sortComparator(p.GetNext(i)!.GetData()!, data) == 0)
             {
-                result.Add(new Tuple<int, Node<T>>(i, p.GetNext(i)));
+                result.Add(new Tuple<int, Node<T>>(i, p.GetNext(i)!));
                 if (multiple)
                 {
                     var pre = p.GetNext(i);
                     var next = p.GetNext(i);
 
                     //look back
-                    while (next.GetNext(0) != null &&
-                           _sortComparator(next.GetNext(0).GetData(), data) == 0)
+                    while (next?.GetNext(0) != null &&
+                           _sortComparator(next.GetNext(0)!.GetData()!, data) == 0)
                     {
-                        result.Add(new Tuple<int, Node<T>>(i, next.GetNext(0)));
+                        result.Add(new Tuple<int, Node<T>>(i, next.GetNext(0)!));
                         next = next.GetNext(0);
                     }
 
                     // look forward
                     while (pre?.GetPre(0) != null &&
                            pre.GetPre(0)!.GetData() != null &&
-                           _sortComparator(pre.GetPre(0).GetData(), data) == 0)
+                           _sortComparator(pre.GetPre(0)!.GetData()!, data) == 0)
                     {
-                        result.Add(new Tuple<int, Node<T>>(i, pre.GetPre(0)));
+                        result.Add(new Tuple<int, Node<T>>(i, pre.GetPre(0)!));
                         pre = pre.GetPre(0);
                     }
                 }

@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using ConsoleApp1;
 
 IDictionary<string, Int64> scoreCaches = new Dictionary<string, Int64>();
-var data = new SkipList<CustomerInfo?>(delegate(CustomerInfo a, CustomerInfo b)
+var data = new SkipList<CustomerInfo>(delegate(CustomerInfo a, CustomerInfo b)
 {
     if (a.Score == b.Score)
         return 0;
@@ -23,7 +23,7 @@ lock (data)
     data.Insert(new CustomerInfo("1003", 10));
     data.Insert(new CustomerInfo("1004", 20));
     data.Insert(new CustomerInfo("1005", 32));
-    
+
     Console.WriteLine(data);
 
     Console.WriteLine(Utils.ToString(data.FindAll(new CustomerInfo(10))));
@@ -41,10 +41,10 @@ lock (data)
 }
 */
 
-var server = new RESTfulService(Environment.ProcessorCount);
-server.GET("/", delegate(HttpListenerContext context)
+var server = new ResTfulService(Environment.ProcessorCount);
+server.GET("/", delegate
 {
-    var renderString = "";
+    string renderString;
     var topN = 10;
 
     lock (data)
@@ -57,7 +57,7 @@ server.GET("/", delegate(HttpListenerContext context)
     return response;
 });
 
-server.GET("/reset", delegate(HttpListenerContext context)
+server.GET("/reset", delegate
 {
     lock (data)
     {
@@ -68,9 +68,9 @@ server.GET("/reset", delegate(HttpListenerContext context)
     return response;
 });
 
-server.GET("/init", delegate(HttpListenerContext context)
+server.GET("/init", delegate
 {
-    var renderString = "";
+    string renderString;
     var topN = 10;
 
     lock (data)
@@ -98,12 +98,12 @@ server.POST(@"/customer/\d+/score/\d+", delegate(HttpListenerContext context)
 {
     var input = context.Request.Url?.LocalPath;
     var pattern = @"\d+";
-    var mc = Regex.Matches(input, pattern);
+    var mc = Regex.Matches(input!, pattern);
     var customerId = mc[0].Value;
     var score = Convert.ToInt64(mc[1].Value);
     var method = "Insert";
-    var renderString = "";
-    var topN = 10;
+    string renderString;
+    const int topN = 10;
 
     lock (data)
     {
@@ -145,7 +145,7 @@ server.GET(@"/leaderboard", delegate(HttpListenerContext context)
         end = Convert.ToInt64(query["end"]);
     }
 
-    var renderString = "";
+    string renderString;
     lock (data)
     {
         renderString = ResultPage.Render($"Leaderboard:{start}-{end}:\n", data.Range(start, end));
@@ -159,7 +159,7 @@ server.GET(@"/leaderboard/\d+", delegate(HttpListenerContext context)
 {
     var input = context.Request.Url?.LocalPath;
     var pattern = @"\d+";
-    var mc = Regex.Matches(input, pattern);
+    var mc = Regex.Matches(input!, pattern);
     var customerId = mc[0].Value;
 
     var query = context.Request.QueryString;
@@ -175,7 +175,7 @@ server.GET(@"/leaderboard/\d+", delegate(HttpListenerContext context)
         low = Convert.ToInt64(query["low"]);
     }
 
-    var renderString = "";
+    string renderString;
     if (scoreCaches.ContainsKey(customerId))
     {
         var info = new CustomerInfo(customerId, scoreCaches[customerId]);
@@ -183,7 +183,7 @@ server.GET(@"/leaderboard/\d+", delegate(HttpListenerContext context)
         {
             // Render around
             renderString = ResultPage.RenderHighlight($"Leaderboard:: Customer:{customerId} (High:{high}-Low:{low}):\n",
-                data.Around(info, high, low), customerId);
+                data.Around(info, high, low)!, customerId);
         }
     }
     else
@@ -195,7 +195,7 @@ server.GET(@"/leaderboard/\d+", delegate(HttpListenerContext context)
     return response;
 });
 
-server.DEFAULT(delegate(HttpListenerContext context)
+server.Default(delegate
 {
     var response = new Tuple<int, string>(404, ResultPage.Render404());
     return response;
