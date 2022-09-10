@@ -15,29 +15,53 @@ public class ResTfulService : IDisposable
     private event Action<HttpListenerContext>? ProcessRequest;
 
     // URL Routes
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
-        _getRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
+    private readonly IDictionary<Regex,
+            Func<HttpListenerContext, Tuple<int, string>>>?
+        _getRoute =
+            new Dictionary<Regex,
+                Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
-        _postRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
+    private readonly IDictionary<Regex,
+            Func<HttpListenerContext, Tuple<int, string>>>?
+        _postRoute =
+            new Dictionary<Regex,
+                Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
-        _putRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
+    private readonly IDictionary<Regex,
+            Func<HttpListenerContext, Tuple<int, string>>>?
+        _putRoute =
+            new Dictionary<Regex,
+                Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
-        _patchRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
+    private readonly IDictionary<Regex,
+            Func<HttpListenerContext, Tuple<int, string>>>?
+        _patchRoute =
+            new Dictionary<Regex,
+                Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
-        _deleteRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
+    private readonly IDictionary<Regex,
+            Func<HttpListenerContext, Tuple<int, string>>>?
+        _deleteRoute =
+            new Dictionary<Regex,
+                Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>
-        _optionsRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
+    private readonly IDictionary<Regex,
+            Func<HttpListenerContext, Tuple<int, string>>>
+        _optionsRoute =
+            new Dictionary<Regex,
+                Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>
-        _traceRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
+    private readonly IDictionary<Regex,
+            Func<HttpListenerContext, Tuple<int, string>>>
+        _traceRoute =
+            new Dictionary<Regex,
+                Func<HttpListenerContext, Tuple<int, string>>>();
 
-    private readonly IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>
-        _headRoute = new Dictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>();
+    private readonly IDictionary<Regex,
+            Func<HttpListenerContext, Tuple<int, string>>>
+        _headRoute =
+            new Dictionary<Regex,
+                Func<HttpListenerContext, Tuple<int, string>>>();
 
     private Func<HttpListenerContext, Tuple<int, string>>? _defaultRoute;
 
@@ -64,7 +88,8 @@ public class ResTfulService : IDisposable
         Stop();
     }
 
-    public void GET(string url, Func<HttpListenerContext, Tuple<int, string>> method)
+    public void GET(string url,
+        Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         var regex = new Regex(url);
@@ -72,7 +97,8 @@ public class ResTfulService : IDisposable
         _getRoute![regex] = method;
     }
 
-    public void POST(string url, Func<HttpListenerContext, Tuple<int, string>> method)
+    public void POST(string url,
+        Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         var regex = new Regex(url);
@@ -80,7 +106,8 @@ public class ResTfulService : IDisposable
         _getRoute![regex] = method;
     }
 
-    public void PUT(string url, Func<HttpListenerContext, Tuple<int, string>> method)
+    public void PUT(string url,
+        Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         var regex = new Regex(url);
@@ -88,7 +115,8 @@ public class ResTfulService : IDisposable
         _getRoute![regex] = method;
     }
 
-    public void PATCH(string url, Func<HttpListenerContext, Tuple<int, string>> method)
+    public void PATCH(string url,
+        Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         var regex = new Regex(url);
@@ -96,7 +124,8 @@ public class ResTfulService : IDisposable
         _getRoute![regex] = method;
     }
 
-    public void DELETE(string url, Func<HttpListenerContext, Tuple<int, string>> method)
+    public void DELETE(string url,
+        Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         var regex = new Regex(url);
@@ -104,7 +133,8 @@ public class ResTfulService : IDisposable
         _getRoute![regex] = method;
     }
 
-    public void OPTIONS(string url, Func<HttpListenerContext, Tuple<int, string>> method)
+    public void OPTIONS(string url,
+        Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         var regex = new Regex(url);
@@ -112,7 +142,8 @@ public class ResTfulService : IDisposable
         _optionsRoute[regex] = method;
     }
 
-    public void TRACE(string url, Func<HttpListenerContext, Tuple<int, string>> method)
+    public void TRACE(string url,
+        Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         var regex = new Regex(url);
@@ -120,7 +151,8 @@ public class ResTfulService : IDisposable
         _traceRoute[regex] = method;
     }
 
-    public void HEAD(string url, Func<HttpListenerContext, Tuple<int, string>> method)
+    public void HEAD(string url,
+        Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
         var regex = new Regex(url);
@@ -148,11 +180,12 @@ public class ResTfulService : IDisposable
     private void ProcessHttpRequest(HttpListenerContext context)
     {
         Func<HttpListenerContext, Tuple<int, string>>? method = null;
-        IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>? routeDict = null;
+        IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
+            routeDict = null;
 
         var path = context.Request.Url!.LocalPath;
 
-        if (path.Length>1 && path[^1] == '/')
+        if (path.Length > 1 && path[^1] == '/')
             path = path[..^1];
 
         routeDict = context.Request.HttpMethod switch
@@ -245,8 +278,8 @@ public class ResTfulService : IDisposable
 
     private void Worker()
     {
-      // ReSharper disable once InconsistentlySynchronizedField
-      WaitHandle[] wait = { _ready, _stop };
+        // ReSharper disable once InconsistentlySynchronizedField
+        WaitHandle[] wait = { _ready, _stop };
         while (0 == WaitAny(wait))
         {
             HttpListenerContext context;

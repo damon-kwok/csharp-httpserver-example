@@ -10,12 +10,13 @@ var server = new ResTfulService(Environment.ProcessorCount);
 server.GET("/", delegate
 {
     string renderString;
-    const int topN = 10;
+    const int topN = 100;
 
     lock (data)
     {
         // Render TopN
-        renderString = ResultPage.Render($"Home Page: Top {topN}:\n", data.Top(topN));
+        renderString =
+            ResultPage.Render($"Home Page: Top {topN}:\n", data.Top(topN), 1);
     }
 
     var response = new Tuple<int, string>(200, renderString);
@@ -36,18 +37,17 @@ server.GET("/reset", delegate
 server.GET("/init", delegate
 {
     string renderString;
-    const int topN = 10;
+    const int topN = 100;
 
     lock (data)
     {
         data.Clear();
-        data.Insert("1001", 1, new CustomerInfo("1001", 1));
-        data.Insert("1002", 2, new CustomerInfo("1002", 2));
-        data.Insert("1003", 3, new CustomerInfo("1003", 3));
-        data.Insert("1004", 4, new CustomerInfo("1004", 4));
-        data.Insert("1005", 5, new CustomerInfo("1005", 5));
+        for (var i = 0; i < topN; i++)
+            data.Insert($"{10001 + i}", i + 1,
+                new CustomerInfo($"{10001 + i}", i + 1));
 
-        renderString = ResultPage.Render($"Init: Top {topN}:\n", data.Top(topN));
+        renderString =
+            ResultPage.Render($"Init: Top {topN}:\n", data.Top(topN), 1);
     }
 
     var response = new Tuple<int, string>(200, renderString);
@@ -62,14 +62,15 @@ server.POST(@"/customer/\d+/score/\d+", delegate(HttpListenerContext context)
     var customerId = mc[0].Value;
     var score = Convert.ToInt64(mc[1].Value);
     string renderString;
-    const int topN = 10;
+    const int topN = 100;
 
     lock (data)
     {
         var method = data.ContainsKey(customerId) ? "Update" : "Insert";
         data.Update(customerId, score, new CustomerInfo(customerId, score));
         // Render TopN
-        renderString = ResultPage.Render($"{method} succeed! Top {topN}:\n", data.Top(topN));
+        renderString = ResultPage.Render($"{method} succeed! Top {topN}:\n",
+            data.Top(topN), 1);
     }
 
     var response = new Tuple<int, string>(200, renderString);
@@ -82,19 +83,21 @@ server.GET(@"/leaderboard", delegate(HttpListenerContext context)
     long start = 0;
     long end = 10;
     if (!string.IsNullOrEmpty(query["start"]))
-    {
         start = Convert.ToInt64(query["start"]);
-    }
-
     if (!string.IsNullOrEmpty(query["end"]))
-    {
         end = Convert.ToInt64(query["end"]);
-    }
+    start = Math.Min(start, end);
+    end = Math.Max(start, end);
+    if (start < 1)
+        start = 1;
+    if (end < 1)
+        end = 1;
 
     string renderString;
     lock (data)
     {
-        renderString = ResultPage.Render($"Leaderboard:{start}-{end}:\n", data.Range(start, end));
+        renderString = ResultPage.Render($"Leaderboard:{start}-{end}:\n",
+            data.Range(start, end), start);
     }
 
     var response = new Tuple<int, string>(200, renderString);
@@ -125,7 +128,8 @@ server.GET(@"/leaderboard/\d+", delegate(HttpListenerContext context)
     lock (data)
     {
         // Render around
-        renderString = ResultPage.RenderHighlight($"Leaderboard:: Customer:{customerId} (High:{high}-Low:{low}):\n",
+        renderString = ResultPage.RenderHighlight(
+            $"Leaderboard:: Customer:{customerId} (High:{high}-Low:{low}):\n",
             data.Around(customerId, high, low), customerId);
     }
 
