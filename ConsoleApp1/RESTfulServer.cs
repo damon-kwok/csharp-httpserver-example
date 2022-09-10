@@ -67,7 +67,7 @@ public class ResTfulService : IDisposable
     public void GET(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
-        Regex regex = new Regex(url);
+        var regex = new Regex(url);
         //_regexCaches[url] = regex;
         _getRoute![regex] = method;
     }
@@ -75,7 +75,7 @@ public class ResTfulService : IDisposable
     public void POST(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
-        Regex regex = new Regex(url);
+        var regex = new Regex(url);
         //_regexCaches[url] = regex;
         _getRoute![regex] = method;
     }
@@ -83,7 +83,7 @@ public class ResTfulService : IDisposable
     public void PUT(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
-        Regex regex = new Regex(url);
+        var regex = new Regex(url);
         //_regexCaches[url] = regex;
         _getRoute![regex] = method;
     }
@@ -91,7 +91,7 @@ public class ResTfulService : IDisposable
     public void PATCH(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
-        Regex regex = new Regex(url);
+        var regex = new Regex(url);
         //_regexCaches[url] = regex;
         _getRoute![regex] = method;
     }
@@ -99,7 +99,7 @@ public class ResTfulService : IDisposable
     public void DELETE(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
-        Regex regex = new Regex(url);
+        var regex = new Regex(url);
         //_regexCaches[url] = regex;
         _getRoute![regex] = method;
     }
@@ -107,7 +107,7 @@ public class ResTfulService : IDisposable
     public void OPTIONS(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
-        Regex regex = new Regex(url);
+        var regex = new Regex(url);
         //_regexCaches[url] = regex;
         _optionsRoute[regex] = method;
     }
@@ -115,7 +115,7 @@ public class ResTfulService : IDisposable
     public void TRACE(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
-        Regex regex = new Regex(url);
+        var regex = new Regex(url);
         //_regexCaches[url] = regex;
         _traceRoute[regex] = method;
     }
@@ -123,17 +123,17 @@ public class ResTfulService : IDisposable
     public void HEAD(string url, Func<HttpListenerContext, Tuple<int, string>> method)
     {
         url = AdjustUrl(url);
-        Regex regex = new Regex(url);
+        var regex = new Regex(url);
         //_regexCaches[url] = regex;
         _headRoute[regex] = method;
     }
 
-    private string AdjustUrl(string url)
+    private static string AdjustUrl(string url)
     {
-        if (String.IsNullOrEmpty(url))
+        if (string.IsNullOrEmpty(url))
             url = "/";
         if (url.Length > 1 && url[^1] == '/')
-            url = url.Substring(0, url.Length - 1);
+            url = url[..^1];
         if (url[^1] != '$')
             url = url + "$";
         return url;
@@ -150,53 +150,36 @@ public class ResTfulService : IDisposable
         Func<HttpListenerContext, Tuple<int, string>>? method = null;
         IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>? routeDict = null;
 
-        string path = context.Request.Url!.LocalPath;
+        var path = context.Request.Url!.LocalPath;
 
         if (path[^1] == '/')
-            path = path.Substring(0, path.Length - 1);
+            path = path[..^1];
 
-        switch (context.Request.HttpMethod)
+        routeDict = context.Request.HttpMethod switch
         {
-            case "GET":
-                routeDict = _getRoute;
-                break;
-            case "POST":
-                routeDict = _postRoute;
-                break;
-            case "PUT":
-                routeDict = _putRoute;
-                break;
-            case "PATCH":
-                routeDict = _patchRoute;
-                break;
-            case "DELETE":
-                routeDict = _deleteRoute;
-                break;
-            case "OPTIONS":
-                routeDict = _optionsRoute;
-                break;
-            case "TRACE":
-                routeDict = _traceRoute;
-                break;
-            case "HEAD":
-                routeDict = _headRoute;
-                break;
-        }
+            "GET" => _getRoute,
+            "POST" => _postRoute,
+            "PUT" => _putRoute,
+            "PATCH" => _patchRoute,
+            "DELETE" => _deleteRoute,
+            "OPTIONS" => _optionsRoute,
+            "TRACE" => _traceRoute,
+            "HEAD" => _headRoute,
+            _ => routeDict
+        };
 
         if (method == null)
         {
             foreach (var pair in routeDict!)
             {
-                if (pair.Key.IsMatch(path))
-                {
-                    method = pair.Value;
-                    break;
-                }
+                if (!pair.Key.IsMatch(path)) continue;
+                method = pair.Value;
+                break;
             }
         }
 
 
-        method ??= _defaultRoute;
+        method ??= _defaultRoute; // if(method==null) set to _defaultRoute
 
         var response = method!(context);
         var buffer = Encoding.UTF8.GetBytes(response.Item2);

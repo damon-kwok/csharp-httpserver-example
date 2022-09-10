@@ -19,8 +19,8 @@ public class SkipList<T>
 
     public void Clear()
     {
-        _head = new(default!, MaxLevel);
-        _random = new();
+        _head = new Node(default!, MaxLevel);
+        _random = new Random();
         _curMaxLevel = 1;
     }
 
@@ -68,7 +68,7 @@ public class SkipList<T>
         if (end < 1)
             end = 1;
         var tmp = _head?.GetNext(0);
-        Int64 i = 0;
+        var i = 0;
         // high
         while (tmp != null && end > 0)
         {
@@ -154,17 +154,13 @@ public class SkipList<T>
         foreach (var tup in nodes)
         {
             var cur = tup.Item2;
-            if (_eraseComparator(cur.GetData(), data))
-            {
-              var pre = cur.GetPre(0);
-                var next = cur.GetNext(0);
-                if (pre != null)
-                    pre.SetNext(0, next);
-                if (next != null)
-                    next.SetPre(0, pre);
-                //result.Add(cur.GetData());
-                break;
-            }
+            if (!_eraseComparator(cur.GetData(), data)) continue;
+            var pre = cur.GetPre(0);
+            var next = cur.GetNext(0);
+            pre?.SetNext(0, next);
+            next?.SetPre(0, pre);
+            //result.Add(cur.GetData());
+            break;
         }
         //return result;
     }
@@ -184,35 +180,33 @@ public class SkipList<T>
             while (p?.GetNext(i) != null &&
                    _sortComparator(p.GetNext(i)!.GetData()!, data) < 0)
                 p = p.GetNext(i);
-            if (p?.GetNext(i) != null &&
-                _sortComparator(p.GetNext(i)!.GetData()!, data) == 0)
+            if (p?.GetNext(i) == null ||
+                _sortComparator(p.GetNext(i)!.GetData()!, data) != 0) continue;
+            result.Add(new Tuple<int, Node>(i, p.GetNext(i)!));
+            if (multiple)
             {
-                result.Add(new Tuple<int, Node>(i, p.GetNext(i)!));
-                if (multiple)
+                var pre = p.GetNext(i);
+                var next = p.GetNext(i);
+
+                //look back
+                while (next?.GetNext(0) != null &&
+                       _sortComparator(next.GetNext(0)!.GetData()!, data) == 0)
                 {
-                    var pre = p.GetNext(i);
-                    var next = p.GetNext(i);
-
-                    //look back
-                    while (next?.GetNext(0) != null &&
-                           _sortComparator(next.GetNext(0)!.GetData()!, data) == 0)
-                    {
-                        result.Add(new Tuple<int, Node>(i, next.GetNext(0)!));
-                        next = next.GetNext(0);
-                    }
-
-                    // look forward
-                    while (pre?.GetPre(0) != null &&
-                           pre.GetPre(0)!.GetData() != null &&
-                           _sortComparator(pre.GetPre(0)!.GetData()!, data) == 0)
-                    {
-                        result.Add(new Tuple<int, Node>(i, pre.GetPre(0)!));
-                        pre = pre.GetPre(0);
-                    }
+                    result.Add(new Tuple<int, Node>(i, next.GetNext(0)!));
+                    next = next.GetNext(0);
                 }
 
-                break;
+                // look forward
+                while (pre?.GetPre(0) != null &&
+                       pre.GetPre(0)!.GetData() != null &&
+                       _sortComparator(pre.GetPre(0)!.GetData()!, data) == 0)
+                {
+                    result.Add(new Tuple<int, Node>(i, pre.GetPre(0)!));
+                    pre = pre.GetPre(0);
+                }
             }
+
+            break;
         }
 
         return result;

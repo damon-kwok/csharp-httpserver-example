@@ -45,7 +45,7 @@ var server = new ResTfulService(Environment.ProcessorCount);
 server.GET("/", delegate
 {
     string renderString;
-    var topN = 10;
+    const int topN = 10;
 
     lock (data)
     {
