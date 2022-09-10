@@ -15,7 +15,7 @@ public static class ResultPage
         foreach (var info in results)
         {
             var rank = rankBegin + i++;
-            var t1 = i % 2 == 1 ? "<td bgcolor=\"grey\">" : "<td>";
+            var t1 = i % 2 == 0 ? "<td bgcolor=\"grey\">" : "<td>";
             const string t2 = "</td>";
             result +=
                 $"<tr> {t1}{info.Id}{t2} {t1}{info.Score}{t2}  {t1}{rank}{t2}</tr>";
