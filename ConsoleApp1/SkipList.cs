@@ -377,7 +377,7 @@ public class SkipList<TKey, TScore, TData>
         {
             cur = cur.Levels[0].Forward;
             if(i>=start && cur != null && cur.Data != null)
-                results.Add(cur!.Data);
+                results.Add(cur.Data);
         }
         return results;
     }

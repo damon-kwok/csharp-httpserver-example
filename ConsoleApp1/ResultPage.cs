@@ -22,9 +22,9 @@ public static class ResultPage
         var i = 0;
         foreach (var info in results)
         {
-            var t1 = info!.ID == highlight ? "<td bgcolor=\"red\">" : "<td>";
+            var t1 = info!.Id == highlight ? "<td bgcolor=\"red\">" : "<td>";
             var t2 = "</td>";
-            result += $"<tr> {t1}{info.ID}{t2} {t1}{info.Score}{t2}  {t1}{++i}{t2}</tr>";
+            result += $"<tr> {t1}{info.Id}{t2} {t1}{info.Score}{t2}  {t1}{++i}{t2}</tr>";
         }
 
         result += "</table>";

@@ -126,7 +126,7 @@ server.GET(@"/leaderboard/\d+", delegate(HttpListenerContext context)
     {
         // Render around
         renderString = ResultPage.RenderHighlight($"Leaderboard:: Customer:{customerId} (High:{high}-Low:{low}):\n",
-            data.Around(customerId, high, low)!, customerId);
+            data.Around(customerId, high, low), customerId);
     }
 
     var response = new Tuple<int, string>(200, renderString);
