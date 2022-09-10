@@ -263,13 +263,13 @@ public class ResTfulService : IDisposable
                 }
             }
 
-            //try
+            try
             {
                 ProcessRequest?.Invoke(context);
             }
-            //catch (Exception e)
+            catch (Exception e)
             {
-                //Console.WriteLine($"[RESTfulService::Worker]err:{e.Message}");
+                Console.WriteLine($"[RESTfulService::Worker]err:{e.Message}");
             }
         }
     }
