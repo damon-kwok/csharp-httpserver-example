@@ -1,4 +1,4 @@
-<a href="http://planet.lisp.org"><img src="https://dhalgara.com/content/images/2018/07/dotnet-logo.png" alt="dotnet Logo" width="80" height="80" align="right"></a>
+<a href="https://dotnet.microsoft.com/en-us/"><img src="https://cdn4.iconfinder.com/data/icons/flat-colored-borderless-file-formats/256/file_format_48-1024.png" alt="dotnet Logo" width="80" height="80" align="right"></a>
 [![Rider](https://img.shields.io/badge/IDE-Rider-1f425f.svg)](https://www.jetbrains.com/rider/)
 [![GitHub license](https://img.shields.io/badge/license-BSD%202%20Clause-2e8b57.svg)](https://github.com/damon-kwok/csharp-httpserver-example/blob/main/LICENSE)
 
@@ -37,4 +37,3 @@
 ## Known Issues
 
 - Viewer: No data paging
-- The current skiplist is not idempotent
