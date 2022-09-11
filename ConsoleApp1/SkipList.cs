@@ -47,7 +47,7 @@ public class SkipList<TKey, TScore, TData>
         _head!.Backward = null;
         _tail = null;
 
-        // create caches
+        // clear caches
         _scoreCaches.Clear();
         //_nodeCaches.Clear();
     }
@@ -313,7 +313,7 @@ public class SkipList<TKey, TScore, TData>
 
     public override string ToString()
     {
-        var result = "\n============Skip List============\n";
+        var result = $"SkipList ({this.Count()})::\n";
         for (var i = 0; i <= _curLevel; i++)
         {
             var node = _head!.Levels[i].Forward;
@@ -473,20 +473,20 @@ public class SkipList<TKey, TScore, TData>
     {
         var cur = _tail;
 
-        // Test <= end
+        // Test cur score <= end
         if (cur == null || this.CompareScore(cur, end) >= 0)
             return false;
 
         cur = _head!.Levels[0].Forward;
-        // Test: >= start
+        // Test: cur score >= start
         return cur != null && this.CompareScore(cur, start) >= 0;
     }
 
-    public List<TData> ScoreRange(TScore a, TScore b)
+    public List<TData> FilterScoreRange(TScore min, TScore max)
     {
         var results = new List<TData>();
-        var low = CompareScore(a, b) < 0 ? a : b;
-        var high = CompareScore(a, b) > 0 ? a : b;
+        var low = CompareScore(min, max) < 0 ? min : max;
+        var high = CompareScore(min, max) > 0 ? min : max;
 
         if (!IsInScoreRange(low, high))
             return results;
@@ -509,12 +509,8 @@ public class SkipList<TKey, TScore, TData>
     public List<TData> Range(long rank1, long rank2)
     {
         var results = new List<TData>();
-        var start = Math.Min(rank1, rank2);
-        var end = Math.Max(rank1, rank2);
-        if (start < 1)
-            start = 1;
-        if (end < 1)
-            end = 1;
+        var start = Math.Max(1, Math.Min(rank1, rank2));
+        var end = Math.Max(1, Math.Max(rank1, rank2));
 
         var n = end - start;
         var cur = this.GetNodeByRank(start);
@@ -528,23 +524,18 @@ public class SkipList<TKey, TScore, TData>
         return results;
     }
 
-    public List<Tuple<long, TData>> Around(TKey key, long a, long b)
+    public List<Tuple<long, TData>> Around(TKey key, long front, long back)
     {
         var results = new List<Tuple<long, TData>>();
         if (!this._scoreCaches.ContainsKey(key))
             return results;
 
-        var high = Math.Min(a, b);
-        var low = Math.Max(a, b);
-        if (high < 0)
-            high = 0;
-        if (low < 0)
-            low = 0;
-
         var (rank, node) = this.GetNodeByKey(key);
-
         if (node == null)
             return results;
+
+        var high = Math.Max(0, Math.Min(front, back));
+        var low = Math.Max(0, Math.Max(front, back));
 
         if (node.Data != null)
             results.Add(new Tuple<long, TData>(rank, node.Data));
@@ -555,7 +546,6 @@ public class SkipList<TKey, TScore, TData>
         {
             cur = cur.Backward;
             i++;
-            //if (cur is { Data: { } }) // if (cur != null && cur.Data != null)
             if (cur?.Data != null)
                 results.Insert(0, new Tuple<long, TData>(rank - i, cur.Data));
             high--;
@@ -568,7 +558,6 @@ public class SkipList<TKey, TScore, TData>
         {
             cur = cur.Levels[0].Forward;
             i++;
-            //if (cur is { Data: { } }) // if (cur != null && cur.Data != null)
             if (cur?.Data != null)
                 results.Add(new Tuple<long, TData>(rank - i, cur.Data));
             low--;
@@ -599,19 +588,17 @@ public class SkipList<TKey, TScore, TData>
 
         public TScore Score { get; set; }
 
-        //private int LevelValue { get; }
         public NodeLevel[] Levels { get; }
         public Node? Backward { get; set; }
 
         public int Span { get; set; }
-        public TData? Data { get; set; }
+        public TData? Data { get; init; }
 
         public Node(TKey k, TScore score, int level)
         {
             this.Key = k;
             this.Score = score;
             this.Data = default(TData);
-            //this.Span = 0;
             this.Backward = null;
             this.Levels = new NodeLevel[level];
             for (var i = 0; i < level; i++)
