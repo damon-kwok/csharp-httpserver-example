@@ -94,7 +94,6 @@ server.POST(@"/customer/\d+/score/-?\d+", delegate(HttpListenerContext context)
         }
     }
 
-
     var response = new Tuple<int, string>(200, renderString);
     return response;
 });
