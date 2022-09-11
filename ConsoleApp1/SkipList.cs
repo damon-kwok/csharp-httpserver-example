@@ -8,6 +8,7 @@ namespace ConsoleApp1;
 public class SkipList<TKey, TScore, TData>
     where TKey : IComparable<TKey>
     where TScore : IComparable<TScore>
+    where TData : class
 {
     private Node? _head;
     private Node? _tail;
@@ -388,6 +389,13 @@ public class SkipList<TKey, TScore, TData>
         return null;
     }
 
+
+    public TData? GetDataByKey(TKey key)
+    {
+        var (_, node) = this.GetNodeByKey(key);
+
+        return node?.Data;
+    }
 
     private Tuple<long, Node?> GetNodeByKey(TKey key)
     {
