@@ -6,7 +6,7 @@ public class CustomerInfo
     public string Id { get; set; }
     public long Score { get; set; }
 
-    public CustomerInfo(string id, Int64 score)
+    public CustomerInfo(string id, long score)
     {
         this.Id = id;
         this.Score = score;
@@ -18,7 +18,7 @@ public class CustomerInfo
         this.Score = 0;
     }
 
-    public CustomerInfo(Int64 score)
+    public CustomerInfo(long score)
     {
         this.Id = "";
         this.Score = score;
