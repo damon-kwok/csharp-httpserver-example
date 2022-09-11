@@ -165,7 +165,7 @@ public class SkipList<TKey, TScore, TData>
         //_nodeCaches.Remove(key);
     }
 
-    public bool ContainsKey(TKey key)
+    private bool ContainsKey(TKey key)
     {
         return this._scoreCaches.ContainsKey(key);
         //var (_, node) = this.GetNodeByKey(key);
@@ -204,8 +204,8 @@ public class SkipList<TKey, TScore, TData>
         //Console.WriteLine($"Successfully deleted key:{key}");
         //return cur;
     }
-
-    public void Update(TKey key, TScore newScore, TData? d)
+    /*
+    public void Update0(TKey key, TScore newScore, TData? d)
     {
         var (_, node) = this.GetNodeByKey(key);
         if (node == null)
@@ -228,14 +228,51 @@ public class SkipList<TKey, TScore, TData>
             this.Delete(key, curScore);
             this.Insert(key, newScore, d);
         }
-        /*
+    }
+
+    public void Update1(TKey key, TScore newScore, TData? d)
+    {
+        var (_, node) = this.GetNodeByKey(key);
+        if (node == null)
+        {
+            this.Insert(key, newScore, d);
+            return;
+        }
+
+        // current score
+        var curScore = node.Score;
+
+        // don't need update score
+        if (curScore.CompareTo(newScore) == 0)
+        {
+            // only update data
+            node.Data = d;
+        }
+        else
+        {
+            this.Delete(key, curScore);
+            this.Insert(key, newScore, d);
+        }
+    }
+    */
+
+    public void Update(TKey key, TScore newScore, TData? d)
+    {
+        if (!_scoreCaches.ContainsKey(key))
+        {
+            this.Insert(key, newScore, d);
+            return;
+        }
+
+        var curScore = _scoreCaches[key];
+
         // We need to seek to element to update to start: this is useful anyway,
         // we'll have to update or remove it.
         var update = new Node[_maxLevel];
         var cur = _head;
         for (var i = _curLevel - 1; i >= 0; i--)
         {
-            while (cur!.Levels[i].Forward != null && //
+            while (cur?.Levels[i].Forward != null && //
                    (CompareScore(cur.Levels[i].Forward!, curScore) < 0 ||
                     (CompareScore(cur.Levels[i].Forward!, curScore) == 0 &&
                      cur.Levels[i].Forward!.Key.CompareTo(key) != 0)))
@@ -243,7 +280,7 @@ public class SkipList<TKey, TScore, TData>
                 cur = cur.Levels[i].Forward;
             }
 
-            update[i] = cur;
+            update[i] = cur!;
         }
 
         // Jump to our element: note that this function assumes that the
@@ -253,23 +290,25 @@ public class SkipList<TKey, TScore, TData>
         // If the node, after the score update, would be still exactly
         // at the same position, we can just update the score without
         // actually removing and re-inserting the element in the SkipList.
-        if ((cur!.Backward != null &&
-             CompareScore(cur.Backward!, newScore) >= 0) ||
-            (cur.Levels[0].Forward != null &&
-             CompareScore(cur.Levels[0].Forward!, newScore) <= 0)) return;
-        cur.Score = newScore;
+        if ((cur?.Backward == null ||
+             CompareScore(cur.Backward!, newScore) < 0) &&
+            (cur?.Levels[0].Forward == null ||
+             CompareScore(cur.Levels[0].Forward!, newScore) > 0))
+        {
+            cur!.Score = newScore;
+        }
 
         // update cache
         _scoreCaches[key] = newScore;
         //_nodeCaches[key] = cur;
 
-        //Console.WriteLine($"Successfully updated key:{key} to newScore:{newScore}");
-        //return cur;
-
         // No way to reuse the old node: we need to remove and insert a new
         // one at a different place.
         this.DeleteNode(cur, update);
-        this.Insert(key, newScore, d);*/
+        this.Insert(key, newScore, d);
+
+        //Console.WriteLine($"Successfully updated key:{key} oldScore:{curScore} to newScore:{newScore}");
+        //return cur;
     }
 
     public override string ToString()
@@ -362,9 +401,7 @@ public class SkipList<TKey, TScore, TData>
     {
         var node = this.GetNodeByScore(score);
 
-        if (node != null && node.Data != null)
-            return node.Data;
-        return default(TData);
+        return node?.Data ?? null;
     }
 
     private Node? GetNodeByRank(long rank)
@@ -427,7 +464,6 @@ public class SkipList<TKey, TScore, TData>
         {
             return new Tuple<long, Node?>(0, null);
         }
-
         traversed += cur.Levels[0].Span;
 
         return new Tuple<long, Node?>(traversed, cur);
@@ -519,7 +555,8 @@ public class SkipList<TKey, TScore, TData>
         {
             cur = cur.Backward;
             i++;
-            if (cur != null && cur.Data != null)
+            //if (cur is { Data: { } }) // if (cur != null && cur.Data != null)
+            if (cur?.Data != null)
                 results.Insert(0, new Tuple<long, TData>(rank - i, cur.Data));
             high--;
         }
@@ -531,7 +568,8 @@ public class SkipList<TKey, TScore, TData>
         {
             cur = cur.Levels[0].Forward;
             i++;
-            if (cur != null && cur.Data != null)
+            //if (cur is { Data: { } }) // if (cur != null && cur.Data != null)
+            if (cur?.Data != null)
                 results.Add(new Tuple<long, TData>(rank - i, cur.Data));
             low--;
         }
