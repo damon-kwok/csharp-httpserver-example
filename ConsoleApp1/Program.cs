@@ -72,21 +72,22 @@ server.POST(@"/customer/\d+/score/-?\d+", delegate(HttpListenerContext context)
         lock (data)
         {
 
-            var info = data.GetDataByKey(customerId);
+            var (_,info) = data.GetDataByKey(customerId);
             if (info !=null)
             {
-                var method =  "Update";
+                const string method = "Update";
                 data.Update(customerId, info.Score +score, new CustomerInfo(customerId, info.Score +score));
                 // Render TopN
-                renderString = ResultPage.Render($"{method} succeed! \n Added {score} score for customer: {customerId}\nTop {topN}:\n",
+                renderString = ResultPage.Render($"{method} succeed! \n Added {score} score for customer: {customerId}",
                     data.Top(topN), 1);
             }
             else
             {
-                var method = "Insert";
+                const string method = "Insert";
                 data.Insert(customerId, score, new CustomerInfo(customerId, score));
+                var (rank,_) = data.GetDataByKey(customerId);
                 // Render TopN
-                renderString = ResultPage.Render($"{method} succeed! Top {topN}:\n",
+                renderString = ResultPage.Render($"{method} succeed! The new Customer: {customerId} current Rank: {rank}",
                     data.Top(topN), 1);
             }
 

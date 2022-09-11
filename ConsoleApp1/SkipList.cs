@@ -390,17 +390,17 @@ public class SkipList<TKey, TScore, TData>
     }
 
 
-    public TData? GetDataByKey(TKey key)
+    public Tuple<long, TData?> GetDataByKey(TKey key)
     {
-        var (_, node) = this.GetNodeByKey(key);
+        var (rank, node) = this.GetNodeByKey(key);
 
-        return node?.Data;
+        return new Tuple<long, TData?>(rank, node?.Data);
     }
 
     private Tuple<long, Node?> GetNodeByKey(TKey key)
     {
-        //if (!this.ContainsKey(key))
-        //    return new Tuple<long, Node?>(0, null);
+        if (!this.ContainsKey(key))
+            return new Tuple<long, Node?>(0, null);
 
         long traversed = 0;
         var score = _scoreCaches[key];

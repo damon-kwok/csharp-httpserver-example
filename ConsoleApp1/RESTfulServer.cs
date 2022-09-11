@@ -272,7 +272,7 @@ public class ResTfulService : IDisposable
         }
         catch (Exception e)
         {
-            Console.WriteLine($"[RESTfulService::ContextReady]err:{e.Message}");
+            Console.WriteLine($"[RESTfulService::ContextReady] err:{e.Message}");
         }
     }
 
@@ -302,7 +302,7 @@ public class ResTfulService : IDisposable
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[RESTfulService::Worker]err:{e.Message}");
+                Console.WriteLine($"[RESTfulService::Worker] err:{e.Message}");
             }
         }
     }
