@@ -54,24 +54,45 @@ server.GET("/init", delegate
     return response;
 });
 
-server.POST(@"/customer/\d+/score/\d+", delegate(HttpListenerContext context)
+server.POST(@"/customer/\d+/score/-?\d+", delegate(HttpListenerContext context)
 {
     var input = context.Request.Url?.LocalPath;
-    const string pattern = @"\d+";
+    const string pattern = @"-?\d+";
     var mc = Regex.Matches(input!, pattern);
     var customerId = mc[0].Value;
     var score = Convert.ToInt64(mc[1].Value);
     string renderString;
-    const int topN = 100;
-
-    lock (data)
+    if (score is < -1000 or > 1000)
     {
-        var method = data.ContainsKey(customerId) ? "Update" : "Insert";
-        data.Update(customerId, score, new CustomerInfo(customerId, score));
-        // Render TopN
-        renderString = ResultPage.Render($"{method} succeed! Top {topN}:\n",
-            data.Top(topN), 1);
+        renderString = ResultPage.RenderTip("Tip::", $"score: {score} is invalid, 'score' is a decimal number in range of (-1000, 1000).");
     }
+    else
+    {
+        const int topN = 100;
+        lock (data)
+        {
+
+            var info = data.GetDataByKey(customerId);
+            if (info !=null)
+            {
+                var method =  "Update";
+                data.Update(customerId, info.Score +score, new CustomerInfo(customerId, info.Score +score));
+                // Render TopN
+                renderString = ResultPage.Render($"{method} succeed! \n Added {score} score for customer: {customerId}\nTop {topN}:\n",
+                    data.Top(topN), 1);
+            }
+            else
+            {
+                var method = "Insert";
+                data.Insert(customerId, score, new CustomerInfo(customerId, score));
+                // Render TopN
+                renderString = ResultPage.Render($"{method} succeed! Top {topN}:\n",
+                    data.Top(topN), 1);
+            }
+
+        }
+    }
+
 
     var response = new Tuple<int, string>(200, renderString);
     return response;
