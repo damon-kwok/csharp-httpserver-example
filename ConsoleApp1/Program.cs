@@ -61,36 +61,40 @@ server.POST(@"/customer/\d+/score/-?\d+", delegate(HttpListenerContext context)
     var mc = Regex.Matches(input!, pattern);
     var customerId = mc[0].Value;
     var score = Convert.ToInt64(mc[1].Value);
+
     string renderString;
     if (score is < -1000 or > 1000)
     {
-        renderString = ResultPage.RenderTip("Tip::", $"score: {score} is invalid, 'score' is a decimal number in range of (-1000, 1000).");
+        renderString = ResultPage.RenderTip("Tip::",
+            $"score: {score} is invalid, 'score' is a decimal number in range of (-1000, 1000).");
     }
     else
     {
         const int topN = 100;
         lock (data)
         {
-
-            var (_,info) = data.GetDataByKey(customerId);
-            if (info !=null)
+            var (_, info) = data.GetDataByKey(customerId);
+            if (info != null)
             {
                 const string method = "Update";
-                data.Update(customerId, info.Score +score, new CustomerInfo(customerId, info.Score +score));
+                data.Update(customerId, info.Score + score,
+                    new CustomerInfo(customerId, info.Score + score));
                 // Render TopN
-                renderString = ResultPage.Render($"{method} succeed! \n Added {score} score for customer: {customerId}",
+                renderString = ResultPage.Render(
+                    $"{method} succeed! \n Added {score} score for customer: {customerId}",
                     data.Top(topN), 1);
             }
             else
             {
                 const string method = "Insert";
-                data.Insert(customerId, score, new CustomerInfo(customerId, score));
-                var (rank,_) = data.GetDataByKey(customerId);
+                data.Insert(customerId, score,
+                    new CustomerInfo(customerId, score));
+                var (rank, _) = data.GetDataByKey(customerId);
                 // Render TopN
-                renderString = ResultPage.Render($"{method} succeed! The new Customer: {customerId} current Rank: {rank}",
+                renderString = ResultPage.Render(
+                    $"{method} succeed! The new Customer: {customerId} current Rank: {rank}",
                     data.Top(topN), 1);
             }
-
         }
     }
 
@@ -98,7 +102,7 @@ server.POST(@"/customer/\d+/score/-?\d+", delegate(HttpListenerContext context)
     return response;
 });
 
-server.GET(@"/leaderboard", delegate(HttpListenerContext context)
+server.GET("/leaderboard", delegate(HttpListenerContext context)
 {
     var query = context.Request.QueryString;
     long start = 0;
@@ -107,12 +111,8 @@ server.GET(@"/leaderboard", delegate(HttpListenerContext context)
         start = Convert.ToInt64(query["start"]);
     if (!string.IsNullOrEmpty(query["end"]))
         end = Convert.ToInt64(query["end"]);
-    start = Math.Min(start, end);
-    end = Math.Max(start, end);
-    if (start < 1)
-        start = 1;
-    if (end < 1)
-        end = 1;
+    start = Math.Max(1, Math.Min(start, end));
+    end = Math.Max(1, Math.Max(start, end));
 
     string renderString;
     lock (data)
@@ -127,30 +127,25 @@ server.GET(@"/leaderboard", delegate(HttpListenerContext context)
 
 server.GET(@"/leaderboard/\d+", delegate(HttpListenerContext context)
 {
-    var input = context.Request.Url?.LocalPath;
+    var path = context.Request.Url?.LocalPath;
     const string pattern = @"\d+";
-    var mc = Regex.Matches(input!, pattern);
+    var mc = Regex.Matches(path!, pattern);
     var customerId = mc[0].Value;
 
     var query = context.Request.QueryString;
     long high = 0;
     long low = 0;
     if (!string.IsNullOrEmpty(query["high"]))
-    {
-        high = Convert.ToInt64(query["high"]);
-    }
-
+        high = Math.Max(0, Convert.ToInt64(query["high"]));
     if (!string.IsNullOrEmpty(query["low"]))
-    {
-        low = Convert.ToInt64(query["low"]);
-    }
+        low = Math.Max(0, Convert.ToInt64(query["low"]));
 
     string renderString;
     lock (data)
     {
         // Render around
         renderString = ResultPage.RenderHighlight(
-            $"Leaderboard:: Customer:{customerId} (High:{high}-Low:{low})\n",
+            $"Leaderboard:: View the Customer: {customerId} (High:{high}-Low:{low})\n",
             data.Around(customerId, high, low), customerId);
     }
 
