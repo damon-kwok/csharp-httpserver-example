@@ -54,4 +54,10 @@ public static class ResultPage
         const string str = "404::\n Are you lost?";
         return str;
     }
+
+    public static string RenderTip(string title, string message)
+    {
+        var result = $"<h2>{title}</h2> {message}";
+        return result;
+    }
 }
