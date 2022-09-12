@@ -54,7 +54,7 @@ server.GET("/init", delegate
     return response;
 });
 
-server.POST(@"/customer/\d+/score/-?\d+", (HttpListenerContext context)=>
+server.POST(@"/customer/\d+/score/-?\d+", context=>
 {
     var input = context.Request.Url?.LocalPath;
     const string pattern = @"-?\d+";
@@ -102,7 +102,7 @@ server.POST(@"/customer/\d+/score/-?\d+", (HttpListenerContext context)=>
     return response;
 });
 
-server.GET("/leaderboard", (HttpListenerContext context)=>
+server.GET("/leaderboard", context=>
 {
     var query = context.Request.QueryString;
     long start = 0;
@@ -125,7 +125,7 @@ server.GET("/leaderboard", (HttpListenerContext context)=>
     return response;
 });
 
-server.GET(@"/leaderboard/\d+", (HttpListenerContext context)=>
+server.GET(@"/leaderboard/\d+", context=>
 {
     var path = context.Request.Url?.LocalPath;
     const string pattern = @"\d+";
