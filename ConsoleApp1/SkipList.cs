@@ -15,7 +15,7 @@ public class SkipList<TKey, TScore, TData>
     private int _curLevel;
     private int _count;
 
-    private readonly int _maxLevel;
+    public int MaxLevel { get; init; }
     private readonly bool _reverseOrder;
 
     private readonly Random _random = new Random();
@@ -28,7 +28,7 @@ public class SkipList<TKey, TScore, TData>
 
     public SkipList(bool reverseOrder, int maxLevel)
     {
-        _maxLevel = maxLevel;
+        MaxLevel = maxLevel;
         _reverseOrder = reverseOrder;
         Clear();
     }
@@ -37,8 +37,8 @@ public class SkipList<TKey, TScore, TData>
     {
         _curLevel = 1;
         _count = 0;
-        _head = new Node(default(TKey)!, default(TScore)!, _maxLevel);
-        for (var i = 0; i < _maxLevel; i++)
+        _head = new Node(default(TKey)!, default(TScore)!, MaxLevel);
+        for (var i = 0; i < MaxLevel; i++)
         {
             _head!.Levels[i].Forward = null;
             _head!.Levels[i].Span = 0;
@@ -57,11 +57,6 @@ public class SkipList<TKey, TScore, TData>
         return _count;
     }
 
-    public int MaxLevel()
-    {
-        return _maxLevel;
-    }
-
     public void Insert(TKey key, TScore score, TData? data)
     {
         if (this._scoreCaches.ContainsKey(key))
@@ -71,8 +66,8 @@ public class SkipList<TKey, TScore, TData>
         }
 
         var cur = _head;
-        var update = new Node?[_maxLevel];
-        var rank = new int[_maxLevel];
+        var update = new Node?[MaxLevel];
+        var rank = new int[MaxLevel];
         for (var i = _curLevel - 1; i >= 0; i--)
         {
             // store rank that is crossed to reach the insert position
@@ -174,7 +169,7 @@ public class SkipList<TKey, TScore, TData>
 
     public void Delete(TKey key, TScore score)
     {
-        var update = new Node[_maxLevel];
+        var update = new Node[MaxLevel];
         var cur = _head;
 
         for (var i = _curLevel - 1; i >= 0; i--)
@@ -268,7 +263,7 @@ public class SkipList<TKey, TScore, TData>
 
         // We need to seek to element to update to start: this is useful anyway,
         // we'll have to update or remove it.
-        var update = new Node[_maxLevel];
+        var update = new Node[MaxLevel];
         var cur = _head;
         for (var i = _curLevel - 1; i >= 0; i--)
         {
@@ -338,7 +333,7 @@ public class SkipList<TKey, TScore, TData>
     private int RandomLevel()
     {
         var level = 1; // limit: min level is 1
-        while (_random.Next(_maxLevel) < Threshold && level < _maxLevel)
+        while (_random.Next(MaxLevel) < Threshold && level < MaxLevel)
             level++;
         return level;
     }
