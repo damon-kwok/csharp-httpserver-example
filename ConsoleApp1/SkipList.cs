@@ -333,7 +333,7 @@ public class SkipList<TKey, TScore, TData>
     private int RandomLevel()
     {
         var level = 1; // limit: min level is 1
-        while (_random.Next(0xffff) < Threshold && level < MaxLevel)
+        while (_random.Next(0, 0xffff) < Threshold && level < MaxLevel)
             level++;
         return level;
     }
