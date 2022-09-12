@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ConsoleApp1;
 
@@ -591,7 +591,6 @@ public class SkipList<TKey, TScore, TData>
         public NodeLevel[] Levels { get; }
         public Node? Backward { get; set; }
 
-        public int Span { get; set; }
         public TData? Data { get; init; }
 
         public Node(TKey k, TScore score, int level)
