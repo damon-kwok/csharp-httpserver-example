@@ -524,7 +524,7 @@ public class SkipList<TKey, TScore, TData>
         return results;
     }
 
-    public List<Tuple<long, TData>> Around(TKey key, long front, long back)
+    public List<Tuple<long, TData>> Around(TKey key, long high, long low)
     {
         var results = new List<Tuple<long, TData>>();
         if (!this._scoreCaches.ContainsKey(key))
@@ -534,8 +534,8 @@ public class SkipList<TKey, TScore, TData>
         if (node == null)
             return results;
 
-        var high = Math.Max(0, Math.Min(front, back));
-        var low = Math.Max(0, Math.Max(front, back));
+        high = Math.Max(0, high);
+        low = Math.Max(0, low);
 
         if (node.Data != null)
             results.Add(new Tuple<long, TData>(rank, node.Data));
