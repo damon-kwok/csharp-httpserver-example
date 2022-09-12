@@ -305,10 +305,6 @@ public class SkipList<TKey, TScore, TData>
             return;
         }
 
-        // update cache
-        _scoreCaches[key] = newScore;
-        //_nodeCaches[key] = cur;
-
         // No way to reuse the old node: we need to remove and insert a new
         // one at a different place.
         this.DeleteNode(cur, update);
