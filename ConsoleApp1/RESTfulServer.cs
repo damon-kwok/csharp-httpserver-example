@@ -180,15 +180,13 @@ public class ResTfulService : IDisposable
     private void ProcessHttpRequest(HttpListenerContext context)
     {
         Func<HttpListenerContext, Tuple<int, string>>? method = null;
-        IDictionary<Regex, Func<HttpListenerContext, Tuple<int, string>>>?
-            routeDict = null;
 
         var path = context.Request.Url!.LocalPath;
 
         if (path.Length > 1 && path[^1] == '/')
             path = path[..^1];
 
-        routeDict = context.Request.HttpMethod switch
+        var routeDict = context.Request.HttpMethod switch
         {
             "GET" => _getRoute,
             "POST" => _postRoute,
@@ -198,8 +196,10 @@ public class ResTfulService : IDisposable
             "OPTIONS" => _optionsRoute,
             "TRACE" => _traceRoute,
             "HEAD" => _headRoute,
-            _ => routeDict
+            _ => null
         };
+        if (routeDict == null)
+            method = _defaultRoute;
 
         if (method == null)
         {
@@ -211,8 +211,7 @@ public class ResTfulService : IDisposable
             }
         }
 
-
-        method ??= _defaultRoute; // if(method==null) set to _defaultRoute
+        method ??= _defaultRoute;
 
         var response = method!(context);
         var buffer = Encoding.UTF8.GetBytes(response.Item2);
