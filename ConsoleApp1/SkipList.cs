@@ -298,6 +298,13 @@ public class SkipList<TKey, TScore, TData>
             cur!.Score = newScore;
         }
 
+        // don't need update score
+        if (curScore.CompareTo(newScore) == 0)
+        {
+            cur.Data = d;
+            return;
+        }
+
         // update cache
         _scoreCaches[key] = newScore;
         //_nodeCaches[key] = cur;
@@ -591,7 +598,7 @@ public class SkipList<TKey, TScore, TData>
         public NodeLevel[] Levels { get; }
         public Node? Backward { get; set; }
 
-        public TData? Data { get; init; }
+        public TData? Data { get; set; }
 
         public Node(TKey k, TScore score, int level)
         {
