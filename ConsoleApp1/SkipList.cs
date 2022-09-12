@@ -507,8 +507,10 @@ public class SkipList<TKey, TScore, TData>
     public List<TData> Range(long rank1, long rank2)
     {
         var results = new List<TData>();
-        var start = Math.Max(1, Math.Min(rank1, rank2));
-        var end = Math.Max(1, Math.Max(rank1, rank2));
+        var start = Math.Max(1, rank1);
+        var end = Math.Max(1, rank2);
+        if (start > end)
+            (start, end) = (end, start);
 
         var n = end - start;
         var cur = this.GetNodeByRank(start);

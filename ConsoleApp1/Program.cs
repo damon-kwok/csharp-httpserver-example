@@ -107,11 +107,11 @@ server.GET("/leaderboard", context=>
     long start = 0;
     long end = 10;
     if (!string.IsNullOrEmpty(query["start"]))
-        start = Convert.ToInt64(query["start"]);
+        start = Math.Max(1, Convert.ToInt64(query["start"]));
     if (!string.IsNullOrEmpty(query["end"]))
-        end = Convert.ToInt64(query["end"]);
-    start = Math.Max(1, Math.Min(start, end));
-    end = Math.Max(1, Math.Max(start, end));
+        end = Math.Max(1, Convert.ToInt64(query["end"]));
+    if(start >end)
+        (start,end) = (end,start);
 
     string renderString;
     lock (data)
