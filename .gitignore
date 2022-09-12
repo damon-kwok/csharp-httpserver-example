@@ -2,6 +2,7 @@
 .DS_Store
 TAGS
 tags
+.vs/
 .idea/
 Debug/
 bin/
