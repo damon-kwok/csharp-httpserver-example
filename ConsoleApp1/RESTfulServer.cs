@@ -171,7 +171,7 @@ public class ResTfulService : IDisposable
         return url;
     }
 
-    public void Default(Func<HttpListenerContext, Tuple<int, string>>? method)
+    public void DEFAULT(Func<HttpListenerContext, Tuple<int, string>>? method)
     {
         if (method != null)
             _defaultRoute = method;

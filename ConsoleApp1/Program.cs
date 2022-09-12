@@ -153,7 +153,7 @@ server.GET(@"/leaderboard/\d+", (HttpListenerContext context)=>
     return response;
 });
 
-server.Default(delegate
+server.DEFAULT(delegate
 {
     var response = new Tuple<int, string>(404, ResultPage.Render404());
     return response;
